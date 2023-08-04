@@ -10,7 +10,7 @@ use crate::args::Args;
 
 pub(crate) async fn parse_query(
     args: &Args,
-    provider: Arc<Provider<Http>>,
+    provider: Arc<Provider<RetryClient<Http>>>,
 ) -> Result<MultiQuery, ParseError> {
     let chunks = blocks::parse_blocks(args, provider).await?;
 

@@ -15,7 +15,7 @@ pub type RateLimiter = governor::RateLimiter<NotKeyed, InMemoryState, DefaultClo
 #[derive(Clone)]
 pub struct Source {
     /// provider data source
-    pub provider: Arc<Provider<Http>>,
+    pub provider: Arc<Provider<RetryClient<Http>>>,
     /// semaphore for controlling concurrency
     pub semaphore: Option<Arc<Semaphore>>,
     /// rate limiter for controlling request rate

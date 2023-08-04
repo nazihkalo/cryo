@@ -8,7 +8,7 @@ use crate::args::Args;
 
 pub(crate) async fn parse_blocks(
     args: &Args,
-    provider: Arc<Provider<Http>>,
+    provider: Arc<Provider<RetryClient<Http>>>,
 ) -> Result<Vec<Chunk>, ParseError> {
     let block_chunks = parse_block_inputs(&args.blocks, &provider).await?;
     let block_chunks = if args.align {
@@ -28,7 +28,7 @@ pub(crate) async fn parse_blocks(
 /// parse block numbers to freeze
 async fn parse_block_inputs(
     inputs: &Vec<String>,
-    provider: &Provider<Http>,
+    provider: &Provider<RetryClient<Http>>,
 ) -> Result<Vec<BlockChunk>, ParseError> {
     match inputs.len() {
         1 => {
@@ -56,7 +56,7 @@ enum RangePosition {
 async fn parse_block_token(
     s: &str,
     as_range: bool,
-    provider: &Provider<Http>,
+    provider: &Provider<RetryClient<Http>>,
 ) -> Result<BlockChunk, ParseError> {
     let s = s.replace('_', "");
     let parts: Vec<&str> = s.split(':').collect();
@@ -117,7 +117,7 @@ async fn parse_block_token(
 async fn parse_block_number(
     block_ref: &str,
     range_position: RangePosition,
-    provider: &Provider<Http>,
+    provider: &Provider<RetryClient<Http>>,
 ) -> Result<u64, ParseError> {
     match (block_ref, range_position) {
         ("latest", _) => provider.get_block_number().await.map(|n| n.as_u64()).map_err(|_e| {
@@ -158,7 +158,7 @@ async fn parse_block_number(
 async fn apply_reorg_buffer(
     block_chunks: Vec<BlockChunk>,
     reorg_filter: u64,
-    provider: &Provider<Http>,
+    provider: &Provider<RetryClient<Http>>,
 ) -> Result<Vec<BlockChunk>, ParseError> {
     match reorg_filter {
         0 => Ok(block_chunks),
