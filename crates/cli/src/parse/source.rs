@@ -13,12 +13,9 @@ use crate::args::Args;
 pub(crate) async fn parse_source(args: &Args) -> Result<Source, ParseError> {
     
     let rpc_url = parse_rpc_url(args);
-    let client = Provider::new_client(rpc_url.as_str(), 10, 500).unwrap();
-
-    // parse network info
-    // let provider = Provider::<Http>::try_from(rpc_url)
-    //     .map_err(|_e| ParseError::ParseError("could not connect to provider".to_string()))?;
-    let chain_id = client
+    let provider = Provider::new_client(rpc_url.as_str(), 10, 500)
+        .map_err(|_e| ParseError::ParseError("could not connect to provider".to_string()))?;
+    let chain_id = provider
         .get_chainid()
         .await
         .map_err(|_e| ParseError::ParseError("could not connect to provider".to_string()))?
@@ -43,7 +40,7 @@ pub(crate) async fn parse_source(args: &Args) -> Result<Source, ParseError> {
     let semaphore = Some(Arc::new(semaphore));
 
     let output = Source {
-        provider: Arc::new(client),
+        provider: Arc::new(provider),
         chain_id,
         semaphore,
         rate_limiter,
