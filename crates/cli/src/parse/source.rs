@@ -110,6 +110,7 @@ mod tests {
             topic2: None,
             topic3: None,
             inner_request_size: 1,
+            no_verbose: false,
         }
     }
 
